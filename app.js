@@ -3,6 +3,17 @@ const fs = require('fs').promises;
 
 const app = express();
 
+function checkHttps(request, response, next) {
+  // Check the protocol — if http, redirect to https.
+  if (request.get("X-Forwarded-Proto").indexOf("https") != -1) {
+    return next();
+  } else {
+    response.redirect("https://" + request.hostname + request.url);
+  }
+}
+
+app.all("*", checkHttps)
+
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
